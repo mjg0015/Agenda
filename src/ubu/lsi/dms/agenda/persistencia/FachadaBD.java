@@ -18,7 +18,7 @@ public class FachadaBD implements FachadaPersistente {
 	@Override
 	public boolean addContacto(Contacto contacto) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
