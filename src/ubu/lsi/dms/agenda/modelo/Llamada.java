@@ -26,6 +26,46 @@ public class Llamada implements Serializable{
 		this.notas = notas;
 	}
 	
+	public String getAsunto() {
+		return asunto;
+	}
+
+	public Contacto getContacto() {
+		return contacto;
+	}
+
+	public String getFechaLlamada() {
+		return fechaLlamada;
+	}
+
+	public int getIdLlamada() {
+		return idLlamada;
+	}
+
+	public String getNotas() {
+		return notas;
+	}
+
+	public void setAsunto(String asunto) {
+		this.asunto = asunto;
+	}
+
+	public void setContacto(Contacto contacto) {
+		this.contacto = contacto;
+	}
+
+	public void setFechaLlamada(String fechaLlamada) {
+		this.fechaLlamada = fechaLlamada;
+	}
+
+	public void setIdLlamada(int idLlamada) {
+		this.idLlamada = idLlamada;
+	}
+
+	public void setNotas(String notas) {
+		this.notas = notas;
+	}
+
 	@Override
 	public String toString() {
 		return "Llamada [idLlamada=" + idLlamada + ", contacto=" + contacto

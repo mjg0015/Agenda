@@ -4,18 +4,21 @@ import java.io.Serializable;
 
 /**
  * Clase de entidad con la información de Contactos
+ * 
  * @author Carlos López
  *
  */
 @SuppressWarnings("serial")
-public class Contacto implements Serializable{
+public class Contacto implements Serializable {
 	private int idContacto;
-	private String  nombre ,  apellidos ,  estimado ,  direccion ,  ciudad ,  prov ,  codPostal ,  region ,
-	pais ,  nombreCompania ,  cargo ,  telefonoTrabajo ,  extensionTrabajo ,  telefonoMovil ,  numFax ,
-	nomCorreoElectronico, notas;
-	
+
+	private String nombre, apellidos, estimado, direccion, ciudad, prov,
+			codPostal, region, pais, nombreCompania, cargo, telefonoTrabajo,
+			extensionTrabajo, telefonoMovil, numFax, nomCorreoElectronico,
+			notas;
+
 	private TipoContacto tipoContacto;
-	
+
 	public Contacto(int idContacto, String nombre, String apellidos,
 			String estimado, String direccion, String ciudad, String prov,
 			String codPostal, String region, String pais,
@@ -44,6 +47,158 @@ public class Contacto implements Serializable{
 		this.tipoContacto = tipoContacto;
 	}
 
+	public String getApellidos() {
+		return apellidos;
+	}
+
+	public String getCargo() {
+		return cargo;
+	}
+
+	public String getCiudad() {
+		return ciudad;
+	}
+
+	public String getCodPostal() {
+		return codPostal;
+	}
+
+	public String getDireccion() {
+		return direccion;
+	}
+
+	public String getEstimado() {
+		return estimado;
+	}
+
+	public String getExtensionTrabajo() {
+		return extensionTrabajo;
+	}
+
+	public int getIdContacto() {
+		return idContacto;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public String getNombreCompania() {
+		return nombreCompania;
+	}
+
+	public String getNomCorreoElectronico() {
+		return nomCorreoElectronico;
+	}
+
+	public String getNotas() {
+		return notas;
+	}
+
+	public String getNumFax() {
+		return numFax;
+	}
+
+	public String getPais() {
+		return pais;
+	}
+
+	public String getProv() {
+		return prov;
+	}
+
+	public String getRegion() {
+		return region;
+	}
+
+	public String getTelefonoMovil() {
+		return telefonoMovil;
+	}
+
+	public String getTelefonoTrabajo() {
+		return telefonoTrabajo;
+	}
+
+	public TipoContacto getTipoContacto() {
+		return tipoContacto;
+	}
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
+	}
+
+	public void setCargo(String cargo) {
+		this.cargo = cargo;
+	}
+
+	public void setCiudad(String ciudad) {
+		this.ciudad = ciudad;
+	}
+
+	public void setCodPostal(String codPostal) {
+		this.codPostal = codPostal;
+	}
+
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+
+	public void setEstimado(String estimado) {
+		this.estimado = estimado;
+	}
+
+	public void setExtensionTrabajo(String extensionTrabajo) {
+		this.extensionTrabajo = extensionTrabajo;
+	}
+
+	public void setIdContacto(int idContacto) {
+		this.idContacto = idContacto;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public void setNombreCompania(String nombreCompania) {
+		this.nombreCompania = nombreCompania;
+	}
+
+	public void setNomCorreoElectronico(String nomCorreoElectronico) {
+		this.nomCorreoElectronico = nomCorreoElectronico;
+	}
+
+	public void setNotas(String notas) {
+		this.notas = notas;
+	}
+
+	public void setNumFax(String numFax) {
+		this.numFax = numFax;
+	}
+
+	public void setPais(String pais) {
+		this.pais = pais;
+	}
+
+	public void setProv(String prov) {
+		this.prov = prov;
+	}
+
+	public void setRegion(String region) {
+		this.region = region;
+	}
+
+	public void setTelefonoMovil(String telefonoMovil) {
+		this.telefonoMovil = telefonoMovil;
+	}
+
+	public void setTelefonoTrabajo(String telefonoTrabajo) {
+		this.telefonoTrabajo = telefonoTrabajo;
+	}
+
+	public void setTipoContacto(TipoContacto tipoContacto) {
+		this.tipoContacto = tipoContacto;
+	}
+
 	@Override
 	public String toString() {
 		return "Contacto [idContacto=" + idContacto + ", nombre=" + nombre
@@ -57,8 +212,5 @@ public class Contacto implements Serializable{
 				+ ", nomCorreoElectronico=" + nomCorreoElectronico + ", notas="
 				+ notas + ", tipoContacto=" + tipoContacto + "]";
 	}
-	
-	
-
 
 }
