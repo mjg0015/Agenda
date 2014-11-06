@@ -11,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import ubu.lsi.dms.agenda.modelo.Contacto;
 import ubu.lsi.dms.agenda.modelo.Llamada;
@@ -27,6 +28,7 @@ public class FachadaBin implements FachadaPersistente {
 	//escritura
 	FileOutputStream fos = null;
     ObjectOutputStream salida = null;
+    private Logger logger = Logger.getLogger("ubu.lsi.dms.agenda.persistencia");
     
 	
 	@Override
@@ -37,16 +39,26 @@ public class FachadaBin implements FachadaPersistente {
 			salida.writeObject(contacto);
 			return true;			
 		} catch (FileNotFoundException e1) {
-			System.err.println("No se encuentra el archivo para guardar");
+			logger.severe(e1.getMessage());
 			e1.printStackTrace();
 			return false;	
 		}
          catch (IOException e) {
-        	 System.err.println("Error entrada salida.");
+        	 logger.severe(e.getMessage());
 			e.printStackTrace();
 			return false;	
 		}
-		 	
+		 finally{
+			 try{
+				 if(fos!=null) 
+					 fos.close();
+				 if(salida!=null)
+					 salida.close(); 
+			 }
+			 catch(IOException e){
+				 System.out.println(e.getMessage());
+			 }
+		 }	
 	}
 
 	@Override
@@ -57,15 +69,26 @@ public class FachadaBin implements FachadaPersistente {
 			salida.writeObject(llamada);
 			return true;			
 		} catch (FileNotFoundException e1) {
-			System.err.println("No se encuentra el archivo para guardar");
+			 logger.severe(e1.getMessage());
 			e1.printStackTrace();
 			return false;	
 		}
         catch (IOException e) {
-       	 System.err.println("Error entrada salida.");
+        	 logger.severe(e.getMessage());
 			e.printStackTrace();
 			return false;	
 		}
+		 finally{
+			 try{
+				 if(fos!=null) 
+					 fos.close();
+				 if(salida!=null)
+					 salida.close(); 
+			 }
+			 catch(IOException e){
+				 logger.severe(e.getMessage());
+			 }
+		 }	
 	}
 
 	@Override
@@ -76,15 +99,26 @@ public class FachadaBin implements FachadaPersistente {
 			salida.writeObject(tipoContacto);
 			return true;			
 		} catch (FileNotFoundException e1) {
-			System.err.println("No se encuentra el archivo para guardar");
+			 logger.severe(e1.getMessage());
 			e1.printStackTrace();
 			return false;	
 		}
         catch (IOException e) {
-       	 System.err.println("Error entrada salida.");
+        	 logger.severe(e.getMessage());
 			e.printStackTrace();
 			return false;	
 		}
+		 finally{
+			 try{
+				 if(fos!=null) 
+					 fos.close();
+				 if(salida!=null)
+					 salida.close(); 
+			 }
+			 catch(IOException e){
+				 logger.severe(e.getMessage());
+			 }
+		 }	
 	}
 
 	@Override
@@ -96,25 +130,78 @@ public class FachadaBin implements FachadaPersistente {
 			entrada = new ObjectInputStream(fis);
 			contacto = (Contacto) entrada.readObject();
 			listaContactos.add(contacto);
+			while(contacto!= null){
+				contacto = (Contacto) entrada.readObject();
+				listaContactos.add(contacto);
+			}
 		}
 		catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
+			 logger.severe(e.getMessage());
 				e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			 logger.severe(e.getMessage());
 			e.printStackTrace();
 		}
         catch (IOException e) {
-			// TODO Auto-generated catch block
+        	 logger.severe(e.getMessage());
 			e.printStackTrace();
 		}
+		 finally{
+			 try{
+				 if(fis!=null) 
+					 fis.close();
+				 if(entrada!=null)
+					 entrada.close(); 
+			 }
+			 catch(IOException e){
+				 logger.severe(e.getMessage());
+			 }
+		 }	
 		return listaContactos;
 	}
 
 	@Override
 	public List<Contacto> getContactos(String apellido) {
-		// TODO Auto-generated method stub
-		return null;
+		//TODO
+		List<Contacto> listaContactos = new ArrayList<Contacto>();
+		Contacto contacto = null;
+		try {
+			fis = new FileInputStream("/ficheros/personas.dat");
+			entrada = new ObjectInputStream(fis);
+			contacto = (Contacto) entrada.readObject();
+			if(apellido.equals(contacto.getApellidos())){
+				listaContactos.add(contacto);
+			}
+			while(contacto!= null){
+				contacto = (Contacto) entrada.readObject();
+				if(apellido.equals(contacto.getApellidos())){
+					listaContactos.add(contacto);
+				}
+			}
+		}
+		catch (ClassNotFoundException e) {
+			 logger.severe(e.getMessage());
+				e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			 logger.severe(e.getMessage());
+			e.printStackTrace();
+		}
+        catch (IOException e) {
+        	 logger.severe(e.getMessage());
+			e.printStackTrace();
+		}
+		 finally{
+			 try{
+				 if(fis!=null) 
+					 fis.close();
+				 if(entrada!=null)
+					 entrada.close(); 
+			 }
+			 catch(IOException e){
+				 logger.severe(e.getMessage());
+			 }
+		 }	
+		return listaContactos;
 	}
 
 	@Override
@@ -131,8 +218,41 @@ public class FachadaBin implements FachadaPersistente {
 
 	@Override
 	public List<TipoContacto> getTiposContacto() {
-		// TODO Auto-generated method stub
-		return null;
+		List<TipoContacto> listaTipos = new ArrayList<TipoContacto>();
+		TipoContacto tipo = null;
+		try {
+			fis = new FileInputStream("/ficheros/personas.dat");
+			entrada = new ObjectInputStream(fis);
+			tipo = (TipoContacto) entrada.readObject();
+			listaTipos.add(tipo);
+			while(tipo!= null){
+				tipo = (TipoContacto) entrada.readObject();
+				listaTipos.add(tipo);
+			}
+		}
+		catch (ClassNotFoundException e) {
+			 logger.severe(e.getMessage());
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			 logger.severe(e.getMessage());
+			e.printStackTrace();
+		}
+        catch (IOException e) {
+        	 logger.severe(e.getMessage());
+			e.printStackTrace();
+		}
+		 finally{
+			 try{
+				 if(fis!=null) 
+					 fis.close();
+				 if(entrada!=null)
+					 entrada.close(); 
+			 }
+			 catch(IOException e){
+				 logger.severe(e.getMessage());
+			 }
+		 }
+		return listaTipos;
 	}
 
 	@Override
