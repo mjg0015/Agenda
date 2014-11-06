@@ -11,7 +11,7 @@ public class Llamada implements Serializable{
 	
 	 private int idLlamada;
 	 private Contacto contacto;
-	 private String fechaLlamada ;
+	 private String fechaLlamada;
 	 private String asunto,notas;
 	 
 	 
@@ -26,6 +26,20 @@ public class Llamada implements Serializable{
 		this.notas = notas;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Llamada other = (Llamada) obj;
+		if (idLlamada != other.idLlamada)
+			return false;
+		return true;
+	}
+
 	public String getAsunto() {
 		return asunto;
 	}
@@ -44,6 +58,14 @@ public class Llamada implements Serializable{
 
 	public String getNotas() {
 		return notas;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + idLlamada;
+		return result;
 	}
 
 	public void setAsunto(String asunto) {

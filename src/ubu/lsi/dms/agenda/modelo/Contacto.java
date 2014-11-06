@@ -47,6 +47,20 @@ public class Contacto implements Serializable {
 		this.tipoContacto = tipoContacto;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Contacto other = (Contacto) obj;
+		if (idContacto != other.idContacto)
+			return false;
+		return true;
+	}
+
 	public String getApellidos() {
 		return apellidos;
 	}
@@ -121,6 +135,14 @@ public class Contacto implements Serializable {
 
 	public TipoContacto getTipoContacto() {
 		return tipoContacto;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + idContacto;
+		return result;
 	}
 
 	public void setApellidos(String apellidos) {
