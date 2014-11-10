@@ -23,7 +23,7 @@ public interface FachadaPersistente {
 	 *            Contacto a insertar.
 	 * @return si se ha insertado correctamente el contacto.
 	 */
-	public boolean addContacto(Contacto contacto);
+	public boolean insertContacto(Contacto contacto);
 
 	/**
 	 * Inserta una nueva llamada en la agenda.
@@ -32,7 +32,7 @@ public interface FachadaPersistente {
 	 *            Llamada a insertar.
 	 * @return si se ha insertado correctamente la llamada.
 	 */
-	public boolean addLlamada(Llamada llamada);
+	public boolean insertLlamada(Llamada llamada);
 
 	/**
 	 * Inserta un nuevo tipo de contacto en la agenda.
@@ -41,7 +41,7 @@ public interface FachadaPersistente {
 	 *            Tipo de contacto a insertar.
 	 * @return si se ha insertado correctamente el tipo de contacto.
 	 */
-	public boolean addTipoContacto(TipoContacto tipoContacto);
+	public boolean insertTipoContacto(TipoContacto tipoContacto);
 
 	/**
 	 * Obtiene todos los contactos.
@@ -89,7 +89,7 @@ public interface FachadaPersistente {
 	 *            Contacto actualizado.
 	 * @return si se ha actualizado correctamente el contacto.
 	 */
-	public boolean updateContacto(Contacto contacto);
+	public boolean updateContacto(int id, Contacto contacto);
 
 	/**
 	 * Actualiza una llamada en la agenda.
@@ -98,7 +98,7 @@ public interface FachadaPersistente {
 	 *            Llamada actualizada.
 	 * @return si se ha actualizado correctamente la llamada.
 	 */
-	public boolean updateLlamada(Llamada llamada);
+	public boolean updateLlamada(int id, Llamada llamada);
 
 	/**
 	 * Actualiza un tipo de contacto en la agenda.
@@ -107,6 +107,6 @@ public interface FachadaPersistente {
 	 *            Tipo de contacto actualizado.
 	 * @return si se ha actualizado correctamente el tipo de contacto.
 	 */
-	public boolean updateTipoContacto(TipoContacto tipoContacto);
+	public boolean updateTipoContacto(int id, TipoContacto tipoContacto);
 
 }
