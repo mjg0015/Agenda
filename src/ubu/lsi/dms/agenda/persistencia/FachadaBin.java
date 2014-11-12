@@ -3,8 +3,9 @@
  */
 package ubu.lsi.dms.agenda.persistencia;
 
+import java.io.EOFException;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,259 +19,267 @@ import ubu.lsi.dms.agenda.modelo.Llamada;
 import ubu.lsi.dms.agenda.modelo.TipoContacto;
 
 /**
- * @author alumno
- *
+ * @author David López Santamaría
+ * @author Álvaro Pérez Delgado
+ * @version 1.0
  */
 public class FachadaBin implements FachadaPersistente {
-	//lectura
-	FileInputStream fis = null;
-    ObjectInputStream entrada = null;
-	//escritura
-	FileOutputStream fos = null;
-    ObjectOutputStream salida = null;
-    private Logger logger = Logger.getLogger("ubu.lsi.dms.agenda.persistencia");
-    
-	
+	static FachadaBin fachadaBin = null;
+	static final String RUTA_ARCHIVO_CONTACTO = "./binarios/contactos.dat";
+	static final String RUTA_ARCHIVO_LLAMADAS = "./binarios/llamadas.dat";
+	static final String RUTA_ARCHIVO_TIPOS = "./binarios/tipos.dat";
+	private Logger logger = Logger.getLogger("ubu.lsi.dms.agenda.persistencia");
+
 	@Override
-	public boolean addContacto(Contacto contacto) {
-		 try {
-			fos = new FileOutputStream("/binarios/contactos.dat");
-			salida = new ObjectOutputStream(fos);
-			salida.writeObject(contacto);
-			return true;			
-		} catch (FileNotFoundException e1) {
-			logger.severe(e1.getMessage());
-			e1.printStackTrace();
-			return false;	
-		}
-         catch (IOException e) {
-        	 logger.severe(e.getMessage());
+	public boolean insertContacto(Contacto contacto) {
+		File archivo = new File(RUTA_ARCHIVO_CONTACTO);
+		//Creamos una lista en la que guardaremos todos los contactos
+		List<Contacto> listaAuxiliar = new ArrayList<Contacto>();
+		try {
+			if (archivo.exists()) {
+				// si existe el archivo recuperamos los contactos que tiene
+				listaAuxiliar = this.getContactos();
+			}
+			// añadimos a la lista(o bien vacia o bien con los datos del .dat),
+			// el contacto que nos pasan
+			listaAuxiliar.add(contacto);
+			// utilizamos el metodo que inserta en un fichero una lista en
+			// la ruta que digamos
+			insertAll(listaAuxiliar, RUTA_ARCHIVO_CONTACTO);
+		} catch (Exception e) {
+			logger.severe(e.getMessage());
 			e.printStackTrace();
-			return false;	
 		}
-		 finally{
-			 try{
-				 if(fos!=null) 
-					 fos.close();
-				 if(salida!=null)
-					 salida.close(); 
-			 }
-			 catch(IOException e){
-				 System.out.println(e.getMessage());
-			 }
-		 }	
+		return true;
 	}
 
 	@Override
-	public boolean addLlamada(Llamada llamada) {
-		 try {
-			fos = new FileOutputStream("/binarios/llamadas.dat");
-			salida = new ObjectOutputStream(fos);
-			salida.writeObject(llamada);
-			return true;			
-		} catch (FileNotFoundException e1) {
-			 logger.severe(e1.getMessage());
-			e1.printStackTrace();
-			return false;	
-		}
-        catch (IOException e) {
-        	 logger.severe(e.getMessage());
+	public boolean insertLlamada(Llamada llamada) {
+		File archivo = new File(RUTA_ARCHIVO_LLAMADAS);
+		//Creamos una lista en la que guardaremos todos los contactos
+		List<Llamada> listaAuxiliar = new ArrayList<Llamada>();
+		try {
+			if (archivo.exists()) {
+				listaAuxiliar = this.getLlamadas();
+			}
+			listaAuxiliar.add(llamada);
+			// utilizamos el metodo que inserta en un fichero toda la lista en
+			// la ruta que digamos
+			insertAll(listaAuxiliar, RUTA_ARCHIVO_LLAMADAS);
+		} catch (Exception e) {
+			logger.severe(e.getMessage());
 			e.printStackTrace();
-			return false;	
 		}
-		 finally{
-			 try{
-				 if(fos!=null) 
-					 fos.close();
-				 if(salida!=null)
-					 salida.close(); 
-			 }
-			 catch(IOException e){
-				 logger.severe(e.getMessage());
-			 }
-		 }	
+		return true;
 	}
 
 	@Override
-	public boolean addTipoContacto(TipoContacto tipoContacto) {
-		 try {
-			fos = new FileOutputStream("/binarios/tipoContactos.dat");
-			salida = new ObjectOutputStream(fos);
-			salida.writeObject(tipoContacto);
-			return true;			
-		} catch (FileNotFoundException e1) {
-			 logger.severe(e1.getMessage());
-			e1.printStackTrace();
-			return false;	
-		}
-        catch (IOException e) {
-        	 logger.severe(e.getMessage());
+	public boolean insertTipoContacto(TipoContacto tipoContacto) {
+		File archivo = new File(RUTA_ARCHIVO_TIPOS);
+		List<TipoContacto> listaAuxiliar = new ArrayList<TipoContacto>();
+		try {
+			if (archivo.exists()) {
+				listaAuxiliar = this.getTiposContacto();
+
+			}
+			listaAuxiliar.add(tipoContacto);
+
+			// utilizamos el metodo que inserta en un fichero toda la lista en
+			// la ruta que digamos
+			insertAll(listaAuxiliar, RUTA_ARCHIVO_TIPOS);
+		} catch (Exception e) {
+			logger.severe(e.getMessage());
 			e.printStackTrace();
-			return false;	
 		}
-		 finally{
-			 try{
-				 if(fos!=null) 
-					 fos.close();
-				 if(salida!=null)
-					 salida.close(); 
-			 }
-			 catch(IOException e){
-				 logger.severe(e.getMessage());
-			 }
-		 }	
+		return true;
 	}
 
 	@Override
 	public List<Contacto> getContactos() {
+		File archivo = new File(RUTA_ARCHIVO_CONTACTO);
 		List<Contacto> listaContactos = new ArrayList<Contacto>();
 		Contacto contacto = null;
-		try {
-			fis = new FileInputStream("/ficheros/personas.dat");
-			entrada = new ObjectInputStream(fis);
-			contacto = (Contacto) entrada.readObject();
-			listaContactos.add(contacto);
-			while(contacto!= null){
+
+		try (ObjectInputStream entrada = new ObjectInputStream(
+				new FileInputStream(archivo));) {
+			if (archivo.exists()) {
 				contacto = (Contacto) entrada.readObject();
 				listaContactos.add(contacto);
+				while (contacto != null) {
+					contacto = (Contacto) entrada.readObject();
+					listaContactos.add(contacto);
+				}
 			}
+		} catch (EOFException e1) {
+			System.out.println("Fin de fichero");
+		} catch (Exception e2) {
+			e2.printStackTrace();
 		}
-		catch (ClassNotFoundException e) {
-			 logger.severe(e.getMessage());
-				e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			 logger.severe(e.getMessage());
-			e.printStackTrace();
-		}
-        catch (IOException e) {
-        	 logger.severe(e.getMessage());
-			e.printStackTrace();
-		}
-		 finally{
-			 try{
-				 if(fis!=null) 
-					 fis.close();
-				 if(entrada!=null)
-					 entrada.close(); 
-			 }
-			 catch(IOException e){
-				 logger.severe(e.getMessage());
-			 }
-		 }	
 		return listaContactos;
 	}
 
 	@Override
 	public List<Contacto> getContactos(String apellido) {
-		//TODO
+		File archivo = new File(RUTA_ARCHIVO_CONTACTO);
 		List<Contacto> listaContactos = new ArrayList<Contacto>();
 		Contacto contacto = null;
-		try {
-			fis = new FileInputStream("/ficheros/personas.dat");
-			entrada = new ObjectInputStream(fis);
-			contacto = (Contacto) entrada.readObject();
-			if(apellido.equals(contacto.getApellidos())){
-				listaContactos.add(contacto);
-			}
-			while(contacto!= null){
+
+		try (ObjectInputStream entrada = new ObjectInputStream(
+				new FileInputStream(archivo));) {
+			if (archivo.exists()) {
 				contacto = (Contacto) entrada.readObject();
-				if(apellido.equals(contacto.getApellidos())){
+				if (apellido.equals(contacto.getApellidos())) {
 					listaContactos.add(contacto);
 				}
+				while (contacto != null) {
+					contacto = (Contacto) entrada.readObject();
+					if (apellido.equals(contacto.getApellidos())) {
+						listaContactos.add(contacto);
+					}
+				}
 			}
+		} catch (EOFException e1) {
+			System.out.println("Fin de fichero");
+		} catch (Exception e2) {
+			e2.printStackTrace();
 		}
-		catch (ClassNotFoundException e) {
-			 logger.severe(e.getMessage());
-				e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			 logger.severe(e.getMessage());
-			e.printStackTrace();
-		}
-        catch (IOException e) {
-        	 logger.severe(e.getMessage());
-			e.printStackTrace();
-		}
-		 finally{
-			 try{
-				 if(fis!=null) 
-					 fis.close();
-				 if(entrada!=null)
-					 entrada.close(); 
-			 }
-			 catch(IOException e){
-				 logger.severe(e.getMessage());
-			 }
-		 }	
 		return listaContactos;
 	}
 
 	@Override
 	public List<Llamada> getLlamadas() {
-		// TODO Auto-generated method stub
-		return null;
+		File archivo = new File(RUTA_ARCHIVO_LLAMADAS);
+		List<Llamada> listaContactos = new ArrayList<Llamada>();
+		Llamada llamada = null;
+
+		try (ObjectInputStream entrada = new ObjectInputStream(
+				new FileInputStream(archivo));) {
+			if (archivo.exists()) {
+				llamada = (Llamada) entrada.readObject();
+				listaContactos.add(llamada);
+				while (llamada != null) {
+					llamada = (Llamada) entrada.readObject();
+					listaContactos.add(llamada);
+				}
+			}
+		} catch (EOFException e1) {
+			System.out.println("Fin de fichero");
+		} catch (Exception e2) {
+			e2.printStackTrace();
+		}
+		return listaContactos;
 	}
 
 	@Override
 	public List<Llamada> getLlamadas(Contacto contacto) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Llamada> listaLlamadas = new ArrayList<Llamada>();
+		List<Llamada> listaLlamadasContacto = new ArrayList<Llamada>();
+
+		Llamada llamada = null;
+
+		listaLlamadas=this.getLlamadas();
+		
+		for(Llamada c : listaLlamadas){
+			llamada=c;
+			if (llamada.getContacto().equals(contacto)){
+				listaLlamadasContacto.add(llamada);
+			}
+		}
+		System.out.println(listaLlamadasContacto);
+		return listaLlamadasContacto;
 	}
 
 	@Override
 	public List<TipoContacto> getTiposContacto() {
-		List<TipoContacto> listaTipos = new ArrayList<TipoContacto>();
-		TipoContacto tipo = null;
-		try {
-			fis = new FileInputStream("/ficheros/personas.dat");
-			entrada = new ObjectInputStream(fis);
-			tipo = (TipoContacto) entrada.readObject();
-			listaTipos.add(tipo);
-			while(tipo!= null){
-				tipo = (TipoContacto) entrada.readObject();
-				listaTipos.add(tipo);
+		File archivo = new File(RUTA_ARCHIVO_TIPOS);
+		List<TipoContacto> listaTiposContactos = new ArrayList<TipoContacto>();
+		TipoContacto tipoContacto = null;
+
+		try (ObjectInputStream entrada = new ObjectInputStream(
+				new FileInputStream(archivo));) {
+			if (archivo.exists()) {
+				tipoContacto = (TipoContacto) entrada.readObject();
+				listaTiposContactos.add(tipoContacto);
+				while (tipoContacto != null) {
+					tipoContacto = (TipoContacto) entrada.readObject();
+					listaTiposContactos.add(tipoContacto);
+				}
 			}
+		} catch (EOFException e1) {
+			System.out.println("Fin de fichero");
+		} catch (Exception e2) {
+			e2.printStackTrace();
 		}
-		catch (ClassNotFoundException e) {
-			 logger.severe(e.getMessage());
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			 logger.severe(e.getMessage());
-			e.printStackTrace();
-		}
-        catch (IOException e) {
-        	 logger.severe(e.getMessage());
-			e.printStackTrace();
-		}
-		 finally{
-			 try{
-				 if(fis!=null) 
-					 fis.close();
-				 if(entrada!=null)
-					 entrada.close(); 
-			 }
-			 catch(IOException e){
-				 logger.severe(e.getMessage());
-			 }
-		 }
-		return listaTipos;
+		return listaTiposContactos;
 	}
 
 	@Override
-	public boolean updateContacto(Contacto contacto) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean updateContacto(int id, Contacto contacto) {
+		List<Contacto> listaTemporal = new ArrayList<Contacto>();
+		listaTemporal = getContactos();
+		listaTemporal.add(id, contacto);
+		listaTemporal.remove(id + 1);
+
+		insertAll(listaTemporal, RUTA_ARCHIVO_CONTACTO);
+
+		return true;
 	}
 
 	@Override
-	public boolean updateLlamada(Llamada llamada) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean updateLlamada(int id, Llamada llamada) {
+		List<Llamada> listaTemporal = new ArrayList<Llamada>();
+		listaTemporal = getLlamadas();
+		listaTemporal.add(id, llamada);
+		listaTemporal.remove(id + 1);
+
+		insertAll(listaTemporal, RUTA_ARCHIVO_LLAMADAS);
+
+		return true;
 	}
 
 	@Override
-	public boolean updateTipoContacto(TipoContacto tipoContacto) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean updateTipoContacto(int id, TipoContacto tipoContacto) {
+		List<TipoContacto> listaTemporal = new ArrayList<TipoContacto>();
+		listaTemporal = getTiposContacto();
+		listaTemporal.add(id, tipoContacto);
+		listaTemporal.remove(id + 1);
+
+		insertAll(listaTemporal, RUTA_ARCHIVO_TIPOS);
+
+		return true;
+	}
+
+	/**
+	 * Constructor Singleton de la clase
+	 * 
+	 * @return fachadaBin
+	 */
+	public static FachadaBin getInstance() {
+		if (fachadaBin == null) {
+			fachadaBin = new FachadaBin();
+		}
+		return fachadaBin;
+	}
+
+	/**
+	 * Este metodo añade a un archivo .dat el contenido de una lista
+	 * 
+	 * @param lista
+	 * @param RUTA_ARCHIVO
+	 */
+	public <E> void insertAll(List<E> lista, String RUTA_ARCHIVO) {
+
+		File archivo = new File(RUTA_ARCHIVO);
+
+		try (ObjectOutputStream salida = new ObjectOutputStream(
+				new FileOutputStream(archivo));) {
+			for (E c : lista) {
+				salida.writeObject(c);
+			}
+		} catch (IOException e) {
+			logger.severe(e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 }
