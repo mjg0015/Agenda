@@ -3,6 +3,8 @@
  */
 package ubu.lsi.dms.agenda.persistencia;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.hsqldb.jdbc.JDBCDataSource;
@@ -19,167 +22,70 @@ import ubu.lsi.dms.agenda.modelo.Llamada;
 import ubu.lsi.dms.agenda.modelo.TipoContacto;
 
 /**
+ * Fachada que implementa la persistencia de la agenda en la base de datos.
+ * 
  * @author Mario Juez
  * @author Álvaro Vázquez
  *
  */
 public class FachadaBD implements FachadaPersistente {
 
+	/**
+	 * Instancia de la fachada.
+	 */
 	private static FachadaBD fachadaBD = null;
-
-	private String bd = "jdbc:hsqldb:mem:.";
-	private String usuario = "SA";
-	private String contraseña = "";
+	
+	/**
+	 * Propiedades de conexión a la base de datos.
+	 */
+	private Properties propiedadesBD;
+	
+	/**
+	 * Conexión a la base de datos.
+	 */
 	private Connection conn;
 
+	/**
+	 * Logger.
+	 */
 	private Logger logger = Logger.getLogger("ubu.lsi.dms.agenda.persistencia");
-
+	
+	/**
+	 * Constructor privado que lee las propiedades de la conexión a la base de
+	 * datos y obtiene la conexión.
+	 */
 	private FachadaBD() {
 
+		propiedadesBD = new Properties();
+
 		try {
+			FileInputStream ficheroPropiedadesBD = new FileInputStream(
+					"propiedades_bd.ini");
+			propiedadesBD.load(ficheroPropiedadesBD);
+			// Cierre del fichero
+			ficheroPropiedadesBD.close();
+
+			// Obtención de la conexión
 			conn = getConnection();
-		} catch (SQLException e) {
+		} catch (SQLException | IOException e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	@Override
-	public boolean addContacto(Contacto contacto) {
-
-		PreparedStatement pstmt = null;
-
-		int idContacto = contacto.getIdContacto();
-		String nombre = contacto.getNombre();
-		String apellidos = contacto.getApellidos();
-		String estimado = contacto.getEstimado();
-		String direccion = contacto.getDireccion();
-		String ciudad = contacto.getCiudad();
-		String prov = contacto.getProv();
-		String codPostal = contacto.getCodPostal();
-		String region = contacto.getRegion();
-		String pais = contacto.getPais();
-		String nombreCompania = contacto.getNombreCompania();
-		String cargo = contacto.getCargo();
-		String telefonoTrabajo = contacto.getTelefonoTrabajo();
-		String extensionTrabajo = contacto.getExtensionTrabajo();
-		String telefonoMovil = contacto.getTelefonoMovil();
-		String numFax = contacto.getNumFax();
-		String nomCorreoElectronico = contacto.getNomCorreoElectronico();
-		int idTipoContacto = contacto.getTipoContacto().getIdTipoContacto();
-		String notas = contacto.getNotas();
-
-		String query = "INSERT INTO  Contactos (IdContacto,Nombre,"
-				+ "Apellidos,Estimado,Direccion,Ciudad,Prov,CodPostal,Region,"
-				+ "Pais,NombreCompania,Cargo,TelefonoTrabajo,ExtensionTrabajo,"
-				+ "TelefonoMovil,NumFax,NomCorreoElectronico,IdTipoContacto,Notas) "
-				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
-		try {
-			pstmt = conn.prepareStatement(query);
-			pstmt.setInt(1, idContacto);
-			pstmt.setString(2, nombre);
-			pstmt.setString(3, apellidos);
-			pstmt.setString(4, estimado);
-			pstmt.setString(5, direccion);
-			pstmt.setString(6, ciudad);
-			pstmt.setString(7, prov);
-			pstmt.setString(8, codPostal);
-			pstmt.setString(9, region);
-			pstmt.setString(10, pais);
-			pstmt.setString(11, nombreCompania);
-			pstmt.setString(12, cargo);
-			pstmt.setString(13, telefonoTrabajo);
-			pstmt.setString(14, extensionTrabajo);
-			pstmt.setString(15, telefonoMovil);
-			pstmt.setString(16, numFax);
-			pstmt.setString(17, nomCorreoElectronico);
-			pstmt.setInt(18, idTipoContacto);
-			pstmt.setString(19, notas);
-
-			return pstmt.executeUpdate() > 0;
-		} catch (SQLException e) {
-			logger.severe(e.getMessage());
-			return false;
-		} finally {
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException e) {
-					logger.warning(e.getMessage());
-				}
-			}
-		}
-
-	}
-
-	@Override
-	public boolean addLlamada(Llamada llamada) {
-
-		PreparedStatement pstmt = null;
-
-		int idLlamada = llamada.getIdLlamada();
-		int idContacto = llamada.getContacto().getIdContacto();
-		String fechaLlamada = llamada.getFechaLlamada();
-		String asunto = llamada.getAsunto();
-		String notas = llamada.getNotas();
-
-		String query = "INSERT INTO  Llamadas (IdLlamada,IdContacto,"
-				+ "FechaLlamada,Asunto,Notas) VALUES(?,?,?,?,?)";
-
-		try {
-			pstmt = conn.prepareStatement(query);
-			pstmt.setInt(1, idLlamada);
-			pstmt.setInt(2, idContacto);
-			pstmt.setString(3, fechaLlamada);
-			pstmt.setString(4, asunto);
-			pstmt.setString(5, notas);
-
-			return pstmt.executeUpdate() > 0;
-		} catch (SQLException e) {
-			logger.severe(e.getMessage());
-			return false;
-		} finally {
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException e) {
-					logger.warning(e.getMessage());
-				}
-			}
-		}
-
-	}
-
-	@Override
-	public boolean addTipoContacto(TipoContacto tipoContacto) {
-
-		PreparedStatement pstmt = null;
-
-		int idTipoContacto = tipoContacto.getIdTipoContacto();
-		String tipo = tipoContacto.getTipoContacto();
-
-		String query = "INSERT INTO  Tiposdecontacto (IdTipoContacto,TipoContacto) "
-				+ "VALUES(?,?)";
-
-		try {
-			pstmt = conn.prepareStatement(query);
-			pstmt.setInt(1, idTipoContacto);
-			pstmt.setString(2, tipo);
-
-			return pstmt.executeUpdate() > 0;
-		} catch (SQLException e) {
-			logger.severe(e.getMessage());
-			return false;
-		} finally {
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException e) {
-					logger.warning(e.getMessage());
-				}
-			}
-		}
+	/**
+	 * Obtiene la conexión a la base de datos.
+	 * 
+	 * @return Conexión a la base de datos.
+	 * @throws SQLException
+	 */
+	private Connection getConnection() throws SQLException {
+		JDBCDataSource ds = new JDBCDataSource();
+		ds.setDatabaseName(propiedadesBD.getProperty("bd"));
+		ds.setUser(propiedadesBD.getProperty("usuario"));
+		ds.setPassword(propiedadesBD.getProperty("contrasena"));
+		// Obtener conexión
+		return ds.getConnection();
 	}
 
 	@Override
@@ -419,7 +325,145 @@ public class FachadaBD implements FachadaPersistente {
 	}
 
 	@Override
-	public boolean updateContacto(Contacto contacto) {
+	public boolean insertContacto(Contacto contacto) {
+
+		PreparedStatement pstmt = null;
+
+		int idContacto = contacto.getIdContacto();
+		String nombre = contacto.getNombre();
+		String apellidos = contacto.getApellidos();
+		String estimado = contacto.getEstimado();
+		String direccion = contacto.getDireccion();
+		String ciudad = contacto.getCiudad();
+		String prov = contacto.getProv();
+		String codPostal = contacto.getCodPostal();
+		String region = contacto.getRegion();
+		String pais = contacto.getPais();
+		String nombreCompania = contacto.getNombreCompania();
+		String cargo = contacto.getCargo();
+		String telefonoTrabajo = contacto.getTelefonoTrabajo();
+		String extensionTrabajo = contacto.getExtensionTrabajo();
+		String telefonoMovil = contacto.getTelefonoMovil();
+		String numFax = contacto.getNumFax();
+		String nomCorreoElectronico = contacto.getNomCorreoElectronico();
+		int idTipoContacto = contacto.getTipoContacto().getIdTipoContacto();
+		String notas = contacto.getNotas();
+
+		String query = "INSERT INTO  Contactos (IdContacto,Nombre,"
+				+ "Apellidos,Estimado,Direccion,Ciudad,Prov,CodPostal,Region,"
+				+ "Pais,NombreCompania,Cargo,TelefonoTrabajo,ExtensionTrabajo,"
+				+ "TelefonoMovil,NumFax,NomCorreoElectronico,IdTipoContacto,Notas) "
+				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+		try {
+			pstmt = conn.prepareStatement(query);
+			pstmt.setInt(1, idContacto);
+			pstmt.setString(2, nombre);
+			pstmt.setString(3, apellidos);
+			pstmt.setString(4, estimado);
+			pstmt.setString(5, direccion);
+			pstmt.setString(6, ciudad);
+			pstmt.setString(7, prov);
+			pstmt.setString(8, codPostal);
+			pstmt.setString(9, region);
+			pstmt.setString(10, pais);
+			pstmt.setString(11, nombreCompania);
+			pstmt.setString(12, cargo);
+			pstmt.setString(13, telefonoTrabajo);
+			pstmt.setString(14, extensionTrabajo);
+			pstmt.setString(15, telefonoMovil);
+			pstmt.setString(16, numFax);
+			pstmt.setString(17, nomCorreoElectronico);
+			pstmt.setInt(18, idTipoContacto);
+			pstmt.setString(19, notas);
+
+			return pstmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			logger.severe(e.getMessage());
+			return false;
+		} finally {
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+					logger.warning(e.getMessage());
+				}
+			}
+		}
+
+	}
+
+	@Override
+	public boolean insertLlamada(Llamada llamada) {
+
+		PreparedStatement pstmt = null;
+
+		int idLlamada = llamada.getIdLlamada();
+		int idContacto = llamada.getContacto().getIdContacto();
+		String fechaLlamada = llamada.getFechaLlamada();
+		String asunto = llamada.getAsunto();
+		String notas = llamada.getNotas();
+
+		String query = "INSERT INTO  Llamadas (IdLlamada,IdContacto,"
+				+ "FechaLlamada,Asunto,Notas) VALUES(?,?,?,?,?)";
+
+		try {
+			pstmt = conn.prepareStatement(query);
+			pstmt.setInt(1, idLlamada);
+			pstmt.setInt(2, idContacto);
+			pstmt.setString(3, fechaLlamada);
+			pstmt.setString(4, asunto);
+			pstmt.setString(5, notas);
+
+			return pstmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			logger.severe(e.getMessage());
+			return false;
+		} finally {
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+					logger.warning(e.getMessage());
+				}
+			}
+		}
+
+	}
+
+	@Override
+	public boolean insertTipoContacto(TipoContacto tipoContacto) {
+
+		PreparedStatement pstmt = null;
+
+		int idTipoContacto = tipoContacto.getIdTipoContacto();
+		String tipo = tipoContacto.getTipoContacto();
+
+		String query = "INSERT INTO  Tiposdecontacto (IdTipoContacto,TipoContacto) "
+				+ "VALUES(?,?)";
+
+		try {
+			pstmt = conn.prepareStatement(query);
+			pstmt.setInt(1, idTipoContacto);
+			pstmt.setString(2, tipo);
+
+			return pstmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			logger.severe(e.getMessage());
+			return false;
+		} finally {
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+					logger.warning(e.getMessage());
+				}
+			}
+		}
+	}
+
+	@Override
+	public boolean updateContacto(int id, Contacto contacto) {
 
 		PreparedStatement pstmt = null;
 
@@ -489,7 +533,7 @@ public class FachadaBD implements FachadaPersistente {
 	}
 
 	@Override
-	public boolean updateLlamada(Llamada llamada) {
+	public boolean updateLlamada(int id, Llamada llamada) {
 
 		PreparedStatement pstmt = null;
 
@@ -527,7 +571,7 @@ public class FachadaBD implements FachadaPersistente {
 	}
 
 	@Override
-	public boolean updateTipoContacto(TipoContacto tipoContacto) {
+	public boolean updateTipoContacto(int id, TipoContacto tipoContacto) {
 
 		PreparedStatement pstmt = null;
 
@@ -556,10 +600,11 @@ public class FachadaBD implements FachadaPersistente {
 		}
 
 	}
-
+	
 	/**
+	 * Uso de patrón de diseño singleton.
 	 * 
-	 * @return
+	 * @return instancia única de la clase.
 	 */
 	public static FachadaBD getInstance() {
 		if (fachadaBD == null) {
@@ -569,19 +614,21 @@ public class FachadaBD implements FachadaPersistente {
 
 		return fachadaBD;
 	}
-
+	
 	/**
+	 * Cierra la conexión y destruye la instancia del objeto.
 	 * 
-	 * @return
-	 * @throws SQLException
+	 * @throws Throwable
 	 */
-	private Connection getConnection() throws SQLException {
-		JDBCDataSource ds = new JDBCDataSource();
-		ds.setDatabaseName(bd);
-		ds.setUser(usuario);
-		ds.setPassword(contraseña);
-		// Obtener conexión
-		return ds.getConnection();
+	@Override
+	protected void finalize() throws Throwable {
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			super.finalize();
+		}
 	}
 
 }
